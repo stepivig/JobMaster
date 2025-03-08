@@ -3,6 +3,7 @@ package org.demo.jobmaster.repository;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.demo.jobmaster.entity.Job;
+import org.demo.jobmaster.entity.Runtime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -34,7 +35,7 @@ public class JobRepositoryJdbcImpl extends SerializableObjectAbstractRepository 
             .name(rs.getString("name"))
             .description(rs.getString("description"))
             .memorySize(rs.getInt("memory_size"))
-            .runtime(Job.Runtime.valueOf(rs.getString("runtime")))
+            .runtime(Runtime.valueOf(rs.getString("runtime")))
             .timeout(rs.getLong("timeout"))
             .active(rs.getBoolean("active"))
             .codeType(Job.CodeType.valueOf(rs.getString("code_type")))

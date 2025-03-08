@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.demo.jobmaster.dto.JobDto;
 import org.demo.jobmaster.entity.Execution;
 import org.demo.jobmaster.entity.Job;
+import org.demo.jobmaster.entity.Runtime;
+import org.demo.jobmaster.entity.Status;
 import org.demo.jobmaster.service.ExecutionService;
 import org.demo.jobmaster.service.JobService;
 import org.junit.jupiter.api.DisplayName;
@@ -50,7 +52,7 @@ class JobControllerTest {
                 .name("Test Job")
                 .description("This is a test job")
                 .memorySize(512)
-                .runtime(Job.Runtime.KOTLIN.getLiteral())
+                .runtime(Runtime.KOTLIN.getLiteral())
                 .timeout(60)
                 .active(true)
                 .codeType("RAW")
@@ -69,7 +71,7 @@ class JobControllerTest {
                 .name(jobDto.getName())
                 .description(jobDto.getDescription())
                 .memorySize(jobDto.getMemorySize())
-                .runtime(Job.Runtime.valueOf(jobDto.getRuntime()))
+                .runtime(Runtime.valueOf(jobDto.getRuntime()))
                 .timeout(jobDto.getTimeout())
                 .active(jobDto.isActive())
                 .codeType(Job.CodeType.RAW)
@@ -104,7 +106,7 @@ class JobControllerTest {
                 .name("Job 1")
                 .description("Desc 1")
                 .memorySize(256)
-                .runtime(Job.Runtime.JAVA)
+                .runtime(Runtime.JAVA)
                 .timeout(30)
                 .active(false)
                 .codeType(Job.CodeType.RAW)
@@ -118,7 +120,7 @@ class JobControllerTest {
                 .name("Job 2")
                 .description("Desc 2")
                 .memorySize(1024)
-                .runtime(Job.Runtime.KOTLIN)
+                .runtime(Runtime.KOTLIN)
                 .timeout(120)
                 .active(true)
                 .codeType(Job.CodeType.RAW)
@@ -168,7 +170,7 @@ class JobControllerTest {
                 .name("Job 1")
                 .description("Desc 1")
                 .memorySize(256)
-                .runtime(Job.Runtime.KOTLIN)
+                .runtime(Runtime.KOTLIN)
                 .timeout(30)
                 .active(false)
                 .codeType(Job.CodeType.RAW)
@@ -269,14 +271,14 @@ class JobControllerTest {
         // Given
         Execution execution1 = Execution.builder()
                 .id(1L)
-                .status(Execution.Status.RUNNING)
+                .status(Status.RUNNING)
                 .startTime(LocalDateTime.now())
                 .customInput(Map.of("key1", "value1"))
                 .build();
 
         Execution execution2 = Execution.builder()
                 .id(2L)
-                .status(Execution.Status.COMPLETED)
+                .status(Status.COMPLETED)
                 .startTime(LocalDateTime.now().minusMinutes(10))
                 .endTime(LocalDateTime.now())
                 .customInput(Map.of("key2", "value2"))
@@ -300,7 +302,7 @@ class JobControllerTest {
         // Given
         Execution execution = Execution.builder()
                 .id(1L)
-                .status(Execution.Status.RUNNING)
+                .status(Status.RUNNING)
                 .startTime(LocalDateTime.now())
                 .customInput(Map.of("key1", "value1"))
                 .build();

@@ -3,7 +3,8 @@ package org.demo.jobmaster.repository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.demo.jobmaster.TestConfig;
 import org.demo.jobmaster.entity.Execution;
-import org.demo.jobmaster.entity.Job;
+import org.demo.jobmaster.entity.Runtime;
+import org.demo.jobmaster.entity.Status;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +43,7 @@ public class ExecutionRepositoryJdbcTest {
     void shouldSaveExecution() {
         // Given
         Execution execution = Execution.builder()
-                .status(Execution.Status.RUNNING)
+                .status(Status.RUNNING)
                 .startTime(LocalDateTime.now())
                 .build();
 
@@ -52,7 +53,7 @@ public class ExecutionRepositoryJdbcTest {
 
         // Then
         assertThat(executions).hasSize(1);
-        assertThat(executions.get(0).getStatus()).isEqualTo(Execution.Status.RUNNING);
+        assertThat(executions.get(0).getStatus()).isEqualTo(Status.RUNNING);
     }
 
     @Test
@@ -60,7 +61,7 @@ public class ExecutionRepositoryJdbcTest {
         // Given
         Execution execution = Execution.builder()
                 .id(1L)
-                .status(Execution.Status.RUNNING)
+                .status(Status.RUNNING)
                 .startTime(LocalDateTime.now().minusMinutes(10))
                 .endTime(LocalDateTime.now())
                 .build();
@@ -69,7 +70,7 @@ public class ExecutionRepositoryJdbcTest {
         // When
         Execution updatedExecution = Execution.builder()
                 .id(1L)
-                .status(Execution.Status.COMPLETED)
+                .status(Status.COMPLETED)
                 .startTime(LocalDateTime.now().minusMinutes(20))
                 .endTime(LocalDateTime.now().plusMinutes(5))
                 .build();
@@ -104,7 +105,7 @@ public class ExecutionRepositoryJdbcTest {
                 .addValue("name", "Test Job")
                 .addValue("description", "This is a test job")
                 .addValue("memorySize", 512)
-                .addValue("runtime", Job.Runtime.JAVA.getLiteral())
+                .addValue("runtime", Runtime.JAVA.getLiteral())
                 .addValue("timeout", 30000)
                 .addValue("active", true)
                 .addValue("codeType", "RAW")

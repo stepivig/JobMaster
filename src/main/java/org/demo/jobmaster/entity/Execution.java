@@ -14,19 +14,4 @@ public class Execution {
     private final LocalDateTime startTime;
     private final LocalDateTime endTime;
     private final Map<String, String> customInput;
-
-    @Getter
-    public enum Status {
-        SCHEDULED("SCHEDULED"),
-        RUNNING("RUNNING"),
-        COMPLETED("COMPLETED"),
-        FAILED("FAILED"),
-        CANCEL_REQUESTED("CANCEL_REQUESTED");
-
-        private final String literal;
-
-        Status(String literal) {
-            this.literal = literal;
-        }
-    }
 }

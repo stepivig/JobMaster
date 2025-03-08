@@ -2,6 +2,7 @@ package org.demo.jobmaster.repository;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.demo.jobmaster.entity.Execution;
+import org.demo.jobmaster.entity.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -95,7 +96,7 @@ public class ExecutionRepositoryJdbcImpl extends SerializableObjectAbstractRepos
         Timestamp endTime = rs.getTimestamp("end_time");
         return Execution.builder()
                 .id(rs.getLong("id"))
-                .status(Execution.Status.valueOf(rs.getString("status")))
+                .status(Status.valueOf(rs.getString("status")))
                 .startTime(startTime != null ? startTime.toLocalDateTime() : null)
                 .endTime(endTime != null ? endTime.toLocalDateTime() : null)
                 .customInput(deserialize(rs, "custom_input"))

@@ -54,15 +54,4 @@ public class Job {
         }
     }
 
-    @Getter
-    public enum Runtime {
-        JAVA("JAVA"),
-        KOTLIN("KOTLIN");
-
-        private final String literal;
-
-        Runtime(String literal) {
-            this.literal = literal;
-        }
-    }
 }
