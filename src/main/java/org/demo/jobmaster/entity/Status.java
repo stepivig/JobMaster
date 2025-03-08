@@ -7,7 +7,7 @@ import lombok.Getter;
  */
 @Getter
 public enum Status {
-    SCHEDULED("SCHEDULED"),
+    QUEUED("QUEUED"),
     RUNNING("RUNNING"),
     COMPLETED("COMPLETED"),
     FAILED("FAILED"),

@@ -2,6 +2,7 @@ package org.demo.jobmaster.entity;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -13,6 +14,7 @@ import java.util.Map;
  */
 @Getter
 @Builder
+@ToString
 public class Job {
     private final Long id;
     private final String name;
@@ -23,6 +25,7 @@ public class Job {
     private final boolean active;
     // Code details
     private final CodeType codeType;
+    @ToString.Exclude
     private final String codeRaw;
     private final Map<String, String> codeInput;
     // Schedule details
