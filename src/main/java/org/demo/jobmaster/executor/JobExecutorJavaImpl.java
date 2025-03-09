@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.demo.jobmaster.entity.Job;
 import org.demo.jobmaster.entity.Runtime;
 import org.springframework.stereotype.Component;
+import util.FilesUtils;
 
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
@@ -14,13 +15,15 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
-import java.util.stream.Stream;
 
+/**
+ * Java job executor implementation.
+ * This class is responsible for executing Java jobs.
+ */
 @Slf4j
 @Component
 public class JobExecutorJavaImpl implements JobExecutor {
@@ -38,6 +41,7 @@ public class JobExecutorJavaImpl implements JobExecutor {
             processRawCode(job, executionId, onSuccess, onError);
         } else {
             log.error("Unsupported code type: {}", job.getCodeType());
+            onError.accept("Unsupported code type: " + job.getCodeType());
         }
     }
 
@@ -66,13 +70,7 @@ public class JobExecutorJavaImpl implements JobExecutor {
             log.error("Error executing Java job", e);
             onError.accept("Execution error: " + e.getMessage());
         } finally {
-            if (tempDir != null) {
-                try {
-                    deleteDirectoryRecursively(tempDir);
-                } catch (IOException e) {
-                    log.error("Failed to delete temporary directory: {}", tempDir, e);
-                }
-            }
+            FilesUtils.deleteDirectoryRecursively(tempDir);
         }
     }
 
@@ -103,13 +101,8 @@ public class JobExecutorJavaImpl implements JobExecutor {
                                   int memoryMB,
                                   long timeoutMillis,
                                   Map<String, String> inputs) throws IOException, InterruptedException {
-        List<String> command = constructCommand(directory, memoryMB);
+        List<String> command = constructCommand(directory, memoryMB, inputs);
 
-        if (inputs != null && !inputs.isEmpty()) {
-            for (Map.Entry<String, String> entry : inputs.entrySet()) {
-                command.add(entry.getKey() + "=" + entry.getValue());
-            }
-        }
 
         ProcessBuilder processBuilder = new ProcessBuilder(command);
         processBuilder.directory(directory.toFile());
@@ -137,7 +130,7 @@ public class JobExecutorJavaImpl implements JobExecutor {
         }
     }
 
-    private List<String> constructCommand(Path directory, int memoryMB) {
+    private List<String> constructCommand(Path directory, int memoryMB, Map<String, String> inputs) {
         List<String> command = new ArrayList<>(6);
         command.add("java");
         command.add("-Xmx" + memoryMB + "M");
@@ -145,20 +138,12 @@ public class JobExecutorJavaImpl implements JobExecutor {
         command.add("-cp");
         command.add(directory.toString());
         command.add(CLASS_NAME);
-        return command;
-    }
-
-    public void deleteDirectoryRecursively(Path path) throws IOException {
-        try (Stream<Path> walk = Files.walk(path)) {
-            walk.sorted(Comparator.reverseOrder())
-                    .forEach(p -> {
-                        try {
-                            Files.delete(p);
-                        } catch (IOException e) {
-                            log.error("Failed to delete file: {}", p, e);
-                        }
-                    });
+        if (inputs != null && !inputs.isEmpty()) {
+            for (Map.Entry<String, String> entry : inputs.entrySet()) {
+                command.add(entry.getKey() + "=" + entry.getValue());
+            }
         }
+        return command;
     }
 
     private record ProcessResult(boolean success, String output) {
