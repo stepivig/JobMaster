@@ -1,12 +1,12 @@
 package org.demo.jobmaster.manager;
 
-import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 import org.demo.jobmaster.entity.Job;
 import org.demo.jobmaster.entity.Runtime;
 import org.demo.jobmaster.entity.Status;
 import org.demo.jobmaster.executor.JobExecutor;
 import org.demo.jobmaster.service.ExecutionService;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Service
-public class JobExecutionManager {
+public class JobExecutionManager implements DisposableBean {
 
     private final ResourceManager resourceManager;
     private final Queue<JobExecutionPair> jobQueue;
@@ -48,8 +48,8 @@ public class JobExecutionManager {
         this.executorService = Executors.newCachedThreadPool();
     }
 
-    @PreDestroy
-    public void shutdown() {
+    @Override
+    public void destroy() {
         executorService.shutdown();
         log.info("Waiting for executor service to terminate...");
         try {

@@ -245,23 +245,31 @@ class JobControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
+
     @Test
-    @DisplayName("Should return all executions for a given job")
+    @DisplayName("Should return all executions for a given job with full field verification")
     void test_getExecutionsByJob() throws Exception {
         // Given
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime tenMinutesAgo = now.minusMinutes(10);
+
         Execution execution1 = Execution.builder()
                 .id(1L)
                 .status(Status.RUNNING)
-                .startTime(LocalDateTime.now())
+                .creationTime(tenMinutesAgo)
+                .startTime(now.minusMinutes(5))
                 .customInput(Map.of("key1", "value1"))
+                .output(null) // Still running, no output yet
                 .build();
 
         Execution execution2 = Execution.builder()
                 .id(2L)
                 .status(Status.COMPLETED)
-                .startTime(LocalDateTime.now().minusMinutes(10))
-                .endTime(LocalDateTime.now())
+                .creationTime(tenMinutesAgo.minusMinutes(5))
+                .startTime(tenMinutesAgo)
+                .endTime(now)
                 .customInput(Map.of("key2", "value2"))
+                .output("Success result")
                 .build();
 
         when(executionService.getExecutionsByJobId(anyLong())).thenReturn(List.of(execution1, execution2));
@@ -270,21 +278,39 @@ class JobControllerTest {
         mockMvc.perform(get("/jobs/1/executions"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
+
+                // First execution (RUNNING)
                 .andExpect(jsonPath("$[0].id").value(1L))
                 .andExpect(jsonPath("$[0].status").value("RUNNING"))
+                .andExpect(jsonPath("$[0].creationTime").exists())
+                .andExpect(jsonPath("$[0].startTime").exists())
+                .andExpect(jsonPath("$[0].endTime").doesNotExist()) // Should be null
+                .andExpect(jsonPath("$[0].customInput.key1").value("value1"))
+                .andExpect(jsonPath("$[0].output").doesNotExist()) // Should be null
+
+                // Second execution (COMPLETED)
                 .andExpect(jsonPath("$[1].id").value(2L))
-                .andExpect(jsonPath("$[1].status").value("COMPLETED"));
+                .andExpect(jsonPath("$[1].status").value("COMPLETED"))
+                .andExpect(jsonPath("$[1].creationTime").exists())
+                .andExpect(jsonPath("$[1].startTime").exists())
+                .andExpect(jsonPath("$[1].endTime").exists())
+                .andExpect(jsonPath("$[1].customInput.key2").value("value2"))
+                .andExpect(jsonPath("$[1].output").value("Success result"));
     }
 
     @Test
-    @DisplayName("Should return execution details when execution exists")
+    @DisplayName("Should return execution details when execution exists with all fields verified")
     void test_getExecution_Found() throws Exception {
         // Given
+        LocalDateTime now = LocalDateTime.now();
         Execution execution = Execution.builder()
                 .id(1L)
-                .status(Status.RUNNING)
-                .startTime(LocalDateTime.now())
-                .customInput(Map.of("key1", "value1"))
+                .status(Status.COMPLETED)
+                .creationTime(now.minusMinutes(15))
+                .startTime(now.minusMinutes(10))
+                .endTime(now.minusMinutes(5))
+                .customInput(Map.of("key1", "value1", "key2", "value2"))
+                .output("Execution output with logs")
                 .build();
 
         when(executionService.getExecutionById(anyLong(), anyLong())).thenReturn(Optional.of(execution));
@@ -293,7 +319,14 @@ class JobControllerTest {
         mockMvc.perform(get("/jobs/1/executions/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
-                .andExpect(jsonPath("$.status").value("RUNNING"));
+                .andExpect(jsonPath("$.status").value("COMPLETED"))
+                .andExpect(jsonPath("$.creationTime").exists())
+                .andExpect(jsonPath("$.startTime").exists())
+                .andExpect(jsonPath("$.endTime").exists())
+                .andExpect(jsonPath("$.customInput").isMap())
+                .andExpect(jsonPath("$.customInput.key1").value("value1"))
+                .andExpect(jsonPath("$.customInput.key2").value("value2"))
+                .andExpect(jsonPath("$.output").value("Execution output with logs"));
     }
 
     @Test

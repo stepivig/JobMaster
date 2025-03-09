@@ -58,6 +58,18 @@ public class JobRepositoryJdbcImpl extends SerializableObjectAbstractRepository 
     }
 
     @Override
+    public List<Job> findAllActiveCron() {
+        String sql = """
+                    SELECT id, name, description, memory_size, runtime, timeout, active, code_type, code_raw, code_input,
+                           schedule_type, schedule_cron_expression, created_at, updated_at
+                    FROM jobs
+                    WHERE active = true AND schedule_type = 'CRON'
+                    ORDER BY id
+                """;
+        return jdbcTemplate.query(sql, JOB_ROW_MAPPER);
+    }
+
+    @Override
     public Optional<Job> findById(Long id) {
         String sql = """
                     SELECT id, name, description, memory_size, runtime, timeout, active, code_type, code_raw, code_input,

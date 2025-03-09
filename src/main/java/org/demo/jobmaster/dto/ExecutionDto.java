@@ -19,7 +19,9 @@ public class ExecutionDto {
     @NotNull(message = "Status cannot be null")
     @EnumValidator(enumClass = Status.class, message = "Invalid Status")
     private String status;
+    private final LocalDateTime creationTime;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private Map<String, String> customInput;
+    private final String output;
 }

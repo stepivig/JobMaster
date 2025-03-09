@@ -27,6 +27,8 @@ public final class ExecutionMapper {
                 .startTime(execution.getStartTime())
                 .endTime(execution.getEndTime())
                 .customInput(execution.getCustomInput())
+                .creationTime(execution.getCreationTime())
+                .output(execution.getOutput())
                 .build();
     }
 
