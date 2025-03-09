@@ -30,8 +30,8 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public Job createJob(Job job) {
-        jobRepository.save(job);
+    public Long createJob(Job job) {
+        Long saved = jobRepository.save(job);
         if (job.isActive()) {
             Job.ScheduleType scheduleType = job.getScheduleType();
             if (scheduleType == Job.ScheduleType.ONCE) {
@@ -42,7 +42,7 @@ public class JobServiceImpl implements JobService {
                 log.warn("Unsupported schedule type: {}", scheduleType);
             }
         }
-        return job;
+        return saved;
     }
 
     @Override

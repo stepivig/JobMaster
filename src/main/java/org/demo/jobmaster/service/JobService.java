@@ -17,9 +17,9 @@ public interface JobService {
      * Creates a new job and stores it in the system.
      *
      * @param job the job entity to be created
-     * @return the created job entity
+     * @return the unique identifier of the created job
      */
-    Job createJob(Job job);
+    Long createJob(Job job);
 
     /**
      * Retrieves a list of all jobs in the system.

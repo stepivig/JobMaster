@@ -15,6 +15,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -62,39 +63,18 @@ class JobControllerTest {
     }
 
     @Test
-    @DisplayName("Should create a new job successfully with all fields verified")
+    @DisplayName("Should create a new job successfully and return job ID")
     void test_createJob() throws Exception {
         // Given
         JobDto jobDto = getTemplate().build();
-        when(jobService.createJob(any(Job.class))).thenReturn(Job.builder()
-                .id(1L)
-                .name(jobDto.getName())
-                .description(jobDto.getDescription())
-                .memorySize(jobDto.getMemorySize())
-                .runtime(Runtime.valueOf(jobDto.getRuntime()))
-                .timeout(jobDto.getTimeout())
-                .active(jobDto.isActive())
-                .codeType(Job.CodeType.RAW)
-                .codeRaw(jobDto.getCodeRaw())
-                .scheduleType(Job.ScheduleType.ONCE)
-                .cronExpression(jobDto.getCronExpression())
-                .build());
+        when(jobService.createJob(any(Job.class))).thenReturn(1L);
 
         // When & Then
         mockMvc.perform(post("/jobs")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(jobDto)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value(jobDto.getName()))
-                .andExpect(jsonPath("$.description").value(jobDto.getDescription()))
-                .andExpect(jsonPath("$.memorySize").value(jobDto.getMemorySize()))
-                .andExpect(jsonPath("$.runtime").value(jobDto.getRuntime()))
-                .andExpect(jsonPath("$.timeout").value(jobDto.getTimeout()))
-                .andExpect(jsonPath("$.active").value(jobDto.isActive()))
-                .andExpect(jsonPath("$.codeType").value(jobDto.getCodeType()))
-                .andExpect(jsonPath("$.codeRaw").value(jobDto.getCodeRaw()))
-                .andExpect(jsonPath("$.scheduleType").value(jobDto.getScheduleType()))
-                .andExpect(jsonPath("$.cronExpression").value(jobDto.getCronExpression()));
+                .andExpect(status().isCreated())
+                .andExpect(MockMvcResultMatchers.content().string("1"));
     }
 
     @Test
