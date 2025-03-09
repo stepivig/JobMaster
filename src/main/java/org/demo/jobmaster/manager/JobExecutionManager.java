@@ -106,7 +106,9 @@ public class JobExecutionManager {
 
         if (jobExecutor != null) {
             try {
-                jobExecutor.execute(job,
+                jobExecutor.execute(
+                        job,
+                        pair.executionId(),
                         output -> onJobComplete(pair, output),
                         error -> onJobError(pair, error));
             } catch (Exception e) {
