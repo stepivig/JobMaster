@@ -14,6 +14,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class ResourceManager {
 
     private int availableMemoryMB;
+    @Getter
     private final int totalMemoryMB;
 
     private int availableThreads;

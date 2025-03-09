@@ -2,6 +2,7 @@ package org.demo.jobmaster.entity;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
@@ -16,7 +17,8 @@ import java.util.Map;
 @Builder
 @ToString
 public class Job {
-    private final Long id;
+    @Setter
+    private Long id;
     private final String name;
     private final String description;
     private final int memorySize;

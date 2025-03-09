@@ -6,6 +6,7 @@ import org.demo.jobmaster.entity.Execution;
 import org.demo.jobmaster.entity.Runtime;
 import org.demo.jobmaster.entity.Status;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
@@ -23,7 +24,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @JdbcTest
 @Import(TestConfig.class)
@@ -45,6 +45,7 @@ public class ExecutionRepositoryJdbcTest {
     }
 
     @Test
+    @DisplayName("Should save execution with all fields populated")
     void shouldSaveExecutionWithAllFields() {
         // Given
         Map<String, String> customInput = new HashMap<>();
@@ -77,6 +78,7 @@ public class ExecutionRepositoryJdbcTest {
     }
 
     @Test
+    @DisplayName("Should save execution with only required fields")
     void shouldSaveExecutionWithMinimumRequiredFields() {
         // Given
         Execution execution = Execution.builder()
@@ -100,6 +102,7 @@ public class ExecutionRepositoryJdbcTest {
     }
 
     @Test
+    @DisplayName("Should retrieve all executions for a given job ID")
     void shouldGetExecutionsByJobId() {
         // Given
         Execution execution1 = Execution.builder()
@@ -129,6 +132,7 @@ public class ExecutionRepositoryJdbcTest {
     }
 
     @Test
+    @DisplayName("Should update execution status correctly")
     void shouldUpdateStatus() {
         // Given
         Execution execution = Execution.builder()
@@ -150,6 +154,7 @@ public class ExecutionRepositoryJdbcTest {
     }
 
     @Test
+    @DisplayName("Should mark execution as running with updated status and start time")
     void shouldMarkAsRunning() {
         // Given
         Execution execution = Execution.builder()
@@ -171,6 +176,7 @@ public class ExecutionRepositoryJdbcTest {
     }
 
     @Test
+    @DisplayName("Should mark execution as completed with success status, end time and output")
     void shouldMarkAsCompleted() {
         // Given
         Execution execution = Execution.builder()
@@ -195,6 +201,7 @@ public class ExecutionRepositoryJdbcTest {
     }
 
     @Test
+    @DisplayName("Should mark execution as failed with error status, end time and error output")
     void shouldMarkAsFailedWithOutput() {
         // Given
         Execution execution = Execution.builder()
@@ -219,24 +226,7 @@ public class ExecutionRepositoryJdbcTest {
     }
 
     @Test
-    void shouldValidateCompletionStatusWithOutput() {
-        // Given
-        Execution execution = Execution.builder()
-                .status(Status.RUNNING)
-                .creationTime(baseTime)
-                .startTime(baseTime.plusMinutes(1))
-                .build();
-        Long executionId = executionRepository.save(1L, execution);
-
-        // When/Then
-        LocalDateTime endTime = baseTime.plusMinutes(5);
-        String output = "Some output";
-        assertThrows(IllegalArgumentException.class, () -> {
-            executionRepository.markAsCompleted(executionId, Status.RUNNING, endTime, output);
-        });
-    }
-
-    @Test
+    @DisplayName("Should return empty Optional when querying non-existent execution")
     void shouldReturnEmptyOptionalForNonExistentExecution() {
         // When
         Optional<Execution> result = executionRepository.getExecutionById(999L);

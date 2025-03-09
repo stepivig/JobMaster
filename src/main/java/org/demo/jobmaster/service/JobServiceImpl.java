@@ -27,11 +27,13 @@ public class JobServiceImpl implements JobService {
         this.jobRepository = jobRepository;
         this.jobExecutionManager = jobExecutionManager;
         this.taskScheduler = new ThreadPoolTaskScheduler();
+        this.taskScheduler.initialize();
     }
 
     @Override
     public Long createJob(Job job) {
-        Long saved = jobRepository.save(job);
+        Long jobId = jobRepository.save(job);
+        job.setId(jobId);
         if (job.isActive()) {
             Job.ScheduleType scheduleType = job.getScheduleType();
             if (scheduleType == Job.ScheduleType.ONCE) {
@@ -42,7 +44,7 @@ public class JobServiceImpl implements JobService {
                 log.warn("Unsupported schedule type: {}", scheduleType);
             }
         }
-        return saved;
+        return jobId;
     }
 
     @Override

@@ -46,6 +46,17 @@ public class ExecutionServiceImpl implements ExecutionService {
     }
 
     @Override
+    public Long createFailedExecution(Long jobId, String errorMessage) {
+        LocalDateTime now = dateService.getCurrentDateTime();
+        Execution execution = Execution.builder()
+                .status(Status.FAILED)
+                .creationTime(now)
+                .endTime(now)
+                .output(errorMessage).build();
+        return executionRepository.save(jobId, execution);
+    }
+
+    @Override
     public boolean markAsCompleted(Long executionId, Status status, String output) {
         if (!TERMINATED_STATUSES.contains(status)) {
             throw new IllegalArgumentException("Status must be COMPLETED or FAILED");

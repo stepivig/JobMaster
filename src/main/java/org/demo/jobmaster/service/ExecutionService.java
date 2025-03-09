@@ -38,6 +38,15 @@ public interface ExecutionService {
     Long createQueuedExecution(Long jobId);
 
     /**
+     * Creates a new failed execution record for a specific job ID with an error message.
+     *
+     * @param jobId        the ID of the job for which to create a failed execution
+     * @param errorMessage the error message associated with the failed execution
+     * @return the ID of the newly created failed execution
+     */
+    Long createFailedExecution(Long jobId, String errorMessage);
+
+    /**
      * Marks an execution as completed with a specific status and output.
      *
      * @param executionId the ID of the execution to mark as completed

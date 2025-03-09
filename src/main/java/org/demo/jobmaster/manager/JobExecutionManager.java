@@ -64,7 +64,12 @@ public class JobExecutionManager {
     }
 
     public void submit(Job job) {
-        log.info("Submitting job: {}", job);
+        log.info("Submitting job {}", job.getId());
+        if (job.getMemorySize() > resourceManager.getTotalMemoryMB()) {
+            log.error("Job {} memory size exceeds available resources", job.getId());
+            executionService.createFailedExecution(job.getId(), "Memory size exceeds available resources");
+            return;
+        }
         Long executionId = executionService.createQueuedExecution(job.getId());
         jobQueue.add(new JobExecutionPair(job, executionId));
         processQueue();
@@ -96,7 +101,7 @@ public class JobExecutionManager {
 
     private void executeJob(JobExecutionPair pair) {
         Job job = pair.job();
-        log.info("Executing job: {} with execution {}", job, pair.executionId());
+        log.info("Start executing job {} with execution {}", job.getId(), pair.executionId());
         JobExecutor jobExecutor = jobExecutorMap.get(job.getRuntime());
 
         if (jobExecutor != null) {
@@ -116,7 +121,7 @@ public class JobExecutionManager {
     }
 
     private void onJobComplete(JobExecutionPair pair, String output) {
-        log.info("Job completed successfully: {} with execution {}", pair.job(), pair.executionId());
+        log.info("Job {} with execution {} completed successfully", pair.job().getId(), pair.executionId());
         Job job = pair.job();
         int memorySize = job.getMemorySize();
         try {
@@ -128,7 +133,7 @@ public class JobExecutionManager {
     }
 
     private void onJobError(JobExecutionPair pair, String error) {
-        log.error("Job failed: {} with execution {}. Error: {}", pair.job(), pair.executionId(), error);
+        log.error("Job {} with execution {} failed. Error: {}", pair.job().getId(), pair.executionId(), error);
         try {
             executionService.markAsCompleted(pair.executionId(), Status.FAILED, error);
         } finally {
@@ -138,7 +143,7 @@ public class JobExecutionManager {
     }
 
     private void handleMissingExecutor(Job job, Long executionId) {
-        log.error("No executor found for job runtime: {}", job.getRuntime());
+        log.error("No executor found for job {} with runtime {}", job.getId(), job.getRuntime());
         executionService.markAsCompleted(executionId, Status.FAILED, "No executor found for runtime: " + job.getRuntime());
     }
 
