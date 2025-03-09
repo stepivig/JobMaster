@@ -61,5 +61,5 @@ public interface ExecutionRepository {
      * @param output      the output to set
      * @return the number of affected rows
      */
-    int markAsCompletedWithOutput(Long executionId, Status status, LocalDateTime endTime, String output);
+    int markAsCompleted(Long executionId, Status status, LocalDateTime endTime, String output);
 }

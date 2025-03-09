@@ -23,7 +23,7 @@ public final class ExecutionMapper {
         }
         return ExecutionDto.builder()
                 .id(execution.getId())
-                .status(execution.getStatus().name())
+                .status(execution.getStatus().getLiteral())
                 .startTime(execution.getStartTime())
                 .endTime(execution.getEndTime())
                 .customInput(execution.getCustomInput())

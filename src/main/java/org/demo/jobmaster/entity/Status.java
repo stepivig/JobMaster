@@ -9,9 +9,11 @@ import lombok.Getter;
 public enum Status {
     QUEUED("QUEUED"),
     RUNNING("RUNNING"),
+    CANCEL_REQUESTED("CANCEL_REQUESTED"),
     COMPLETED("COMPLETED"),
     FAILED("FAILED"),
-    CANCEL_REQUESTED("CANCEL_REQUESTED");
+    TERMINATED("TERMINATED"),
+    CANCELLED("CANCELLED");
 
     private final String literal;
 

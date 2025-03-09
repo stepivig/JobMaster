@@ -171,7 +171,7 @@ public class ExecutionRepositoryJdbcTest {
     }
 
     @Test
-    void shouldMarkAsCompletedWithOutput() {
+    void shouldMarkAsCompleted() {
         // Given
         Execution execution = Execution.builder()
                 .status(Status.RUNNING)
@@ -183,7 +183,7 @@ public class ExecutionRepositoryJdbcTest {
         // When
         LocalDateTime endTime = baseTime.plusMinutes(10);
         String output = "Execution completed successfully with data: [result=123]";
-        int marked = executionRepository.markAsCompletedWithOutput(executionId, Status.COMPLETED, endTime, output);
+        int marked = executionRepository.markAsCompleted(executionId, Status.COMPLETED, endTime, output);
 
         // Then
         assertThat(marked).isEqualTo(1);
@@ -207,7 +207,7 @@ public class ExecutionRepositoryJdbcTest {
         // When
         LocalDateTime endTime = baseTime.plusMinutes(3);
         String errorOutput = "Execution failed with exception: NullPointerException at line 42";
-        int marked = executionRepository.markAsCompletedWithOutput(executionId, Status.FAILED, endTime, errorOutput);
+        int marked = executionRepository.markAsCompleted(executionId, Status.FAILED, endTime, errorOutput);
 
         // Then
         assertThat(marked).isEqualTo(1);
@@ -232,7 +232,7 @@ public class ExecutionRepositoryJdbcTest {
         LocalDateTime endTime = baseTime.plusMinutes(5);
         String output = "Some output";
         assertThrows(IllegalArgumentException.class, () -> {
-            executionRepository.markAsCompletedWithOutput(executionId, Status.RUNNING, endTime, output);
+            executionRepository.markAsCompleted(executionId, Status.RUNNING, endTime, output);
         });
     }
 

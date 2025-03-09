@@ -107,14 +107,7 @@ public class ExecutionRepositoryJdbcImpl extends SerializableObjectAbstractRepos
     }
 
     @Override
-    public int markAsCompletedWithOutput(Long executionId,
-                                         Status status,
-                                         LocalDateTime endTime,
-                                         String output) {
-        if (status != Status.COMPLETED && status != Status.FAILED) {
-            throw new IllegalArgumentException("Status must be COMPLETED or FAILED");
-        }
-
+    public int markAsCompleted(Long executionId, Status status, LocalDateTime endTime, String output) {
         String sql = """
                 UPDATE executions SET
                     status = :status,
