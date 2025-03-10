@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS JOBS
 (
     ID                       BIGINT AUTO_INCREMENT PRIMARY KEY,
-    NAME                     VARCHAR(30)  NOT NULL,
+    NAME                     VARCHAR(100)  NOT NULL,
     DESCRIPTION              VARCHAR(500) NOT NULL,
     MEMORY_SIZE              INT          NOT NULL CHECK (MEMORY_SIZE > 0),
     RUNTIME                  VARCHAR(20)  NOT NULL CHECK (RUNTIME IN ('JAVA', 'KOTLIN')),
