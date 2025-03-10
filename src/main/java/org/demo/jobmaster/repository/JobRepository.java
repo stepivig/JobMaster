@@ -19,6 +19,13 @@ public interface JobRepository {
     List<Job> findAll();
 
     /**
+     * Retrieves all active cron jobs from the repository.
+     *
+     * @return a list of all active cron jobs.
+     */
+    List<Job> findAllActiveCron();
+
+    /**
      * Finds a job by its unique identifier.
      *
      * @param id the unique identifier of the job.

@@ -5,6 +5,7 @@ import org.demo.jobmaster.TestConfig;
 import org.demo.jobmaster.entity.Job;
 import org.demo.jobmaster.entity.Job.CodeType;
 import org.demo.jobmaster.entity.Job.ScheduleType;
+import org.demo.jobmaster.entity.Runtime;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -53,7 +54,7 @@ class JobRepositoryJdbcTest {
                 .name("Test Job")
                 .description("This is a test job")
                 .memorySize(512)
-                .runtime(Job.Runtime.JAVA)
+                .runtime(Runtime.JAVA)
                 .timeout(60)
                 .active(true)
                 .codeType(CodeType.RAW)

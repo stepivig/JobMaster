@@ -9,6 +9,7 @@ import org.demo.jobmaster.mapper.JobMapper;
 import org.demo.jobmaster.service.ExecutionService;
 import org.demo.jobmaster.service.JobService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,10 +37,10 @@ public class JobController {
     }
 
     @PostMapping
-    public ResponseEntity<JobDto> createJob(@RequestBody @Valid JobDto jobDto) {
+    public ResponseEntity<Long> createJob(@RequestBody @Valid JobDto jobDto) {
         Job job = JobMapper.toEntity(jobDto);
-        Job createdJob = jobService.createJob(job);
-        return ResponseEntity.ok(JobMapper.toDto(createdJob));
+        Long createdJobId = jobService.createJob(job);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdJobId);
     }
 
     @GetMapping

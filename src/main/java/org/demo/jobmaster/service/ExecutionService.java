@@ -1,6 +1,7 @@
 package org.demo.jobmaster.service;
 
 import org.demo.jobmaster.entity.Execution;
+import org.demo.jobmaster.entity.Status;
 
 import java.util.List;
 import java.util.Optional;
@@ -27,5 +28,40 @@ public interface ExecutionService {
      * @return an Optional containing the Execution entity if found, otherwise empty
      */
     Optional<Execution> getExecutionById(Long jobId, Long executionId);
+
+    /**
+     * Creates a new queued execution record for a specific job ID.
+     *
+     * @param jobId the ID of the job for which to create a queued execution
+     * @return the ID of the newly created queued execution
+     */
+    Long createQueuedExecution(Long jobId);
+
+    /**
+     * Creates a new failed execution record for a specific job ID with an error message.
+     *
+     * @param jobId        the ID of the job for which to create a failed execution
+     * @param errorMessage the error message associated with the failed execution
+     * @return the ID of the newly created failed execution
+     */
+    Long createFailedExecution(Long jobId, String errorMessage);
+
+    /**
+     * Marks an execution as completed with a specific status and output.
+     *
+     * @param executionId the ID of the execution to mark as completed
+     * @param status      the status to set for the completed execution
+     * @param output      the output of the completed execution
+     * @return true if the operation was successful, false otherwise
+     */
+    boolean markAsCompleted(Long executionId, Status status, String output);
+
+    /**
+     * Marks an execution as running.
+     *
+     * @param executionId the ID of the execution to mark as running
+     * @return true if the operation was successful, false otherwise
+     */
+    boolean markAsRunning(Long executionId);
 }
 

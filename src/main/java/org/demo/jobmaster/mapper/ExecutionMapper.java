@@ -2,6 +2,7 @@ package org.demo.jobmaster.mapper;
 
 import org.demo.jobmaster.dto.ExecutionDto;
 import org.demo.jobmaster.entity.Execution;
+import org.demo.jobmaster.entity.Status;
 
 /**
  * Mapper class to convert between {@link Execution} and {@link ExecutionDto}
@@ -22,10 +23,12 @@ public final class ExecutionMapper {
         }
         return ExecutionDto.builder()
                 .id(execution.getId())
-                .status(execution.getStatus().name())
+                .status(execution.getStatus().getLiteral())
                 .startTime(execution.getStartTime())
                 .endTime(execution.getEndTime())
                 .customInput(execution.getCustomInput())
+                .creationTime(execution.getCreationTime())
+                .output(execution.getOutput())
                 .build();
     }
 
@@ -41,7 +44,7 @@ public final class ExecutionMapper {
         }
         return Execution.builder()
                 .id(executionDto.getId())
-                .status(Execution.Status.valueOf(executionDto.getStatus()))
+                .status(Status.valueOf(executionDto.getStatus()))
                 .startTime(executionDto.getStartTime())
                 .endTime(executionDto.getEndTime())
                 .customInput(executionDto.getCustomInput())

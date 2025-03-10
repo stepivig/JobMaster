@@ -7,7 +7,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.demo.jobmaster.entity.Job;
+import org.demo.jobmaster.entity.Runtime;
 import org.demo.jobmaster.validation.EnumValidator;
+import org.demo.jobmaster.validation.ValidCronExpression;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -26,7 +28,7 @@ public class JobDto {
     @Min(value = 1, message = "Memory size must be at least 1 MB")
     private int memorySize;
     @NotBlank(message = "Runtime cannot be empty")
-    @EnumValidator(enumClass = Job.Runtime.class, message = "Invalid ScheduleType")
+    @EnumValidator(enumClass = Runtime.class, message = "Invalid ScheduleType")
     private String runtime;
     @Min(value = 1, message = "Timeout must be at least 1 second")
     private long timeout;
@@ -40,6 +42,7 @@ public class JobDto {
     @NotNull(message = "ScheduleType cannot be null")
     @EnumValidator(enumClass = Job.ScheduleType.class, message = "Invalid ScheduleType")
     private String scheduleType;
+    @ValidCronExpression(message = "Invalid cron expression format")
     private String cronExpression;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

@@ -2,6 +2,8 @@ package org.demo.jobmaster.entity;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -13,8 +15,10 @@ import java.util.Map;
  */
 @Getter
 @Builder
+@ToString
 public class Job {
-    private final Long id;
+    @Setter
+    private Long id;
     private final String name;
     private final String description;
     private final int memorySize;
@@ -23,6 +27,7 @@ public class Job {
     private final boolean active;
     // Code details
     private final CodeType codeType;
+    @ToString.Exclude
     private final String codeRaw;
     private final Map<String, String> codeInput;
     // Schedule details
@@ -54,15 +59,4 @@ public class Job {
         }
     }
 
-    @Getter
-    public enum Runtime {
-        JAVA("JAVA"),
-        KOTLIN("KOTLIN");
-
-        private final String literal;
-
-        Runtime(String literal) {
-            this.literal = literal;
-        }
-    }
 }

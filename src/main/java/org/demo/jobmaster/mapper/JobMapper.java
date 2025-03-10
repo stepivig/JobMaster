@@ -2,6 +2,7 @@ package org.demo.jobmaster.mapper;
 
 import org.demo.jobmaster.dto.JobDto;
 import org.demo.jobmaster.entity.Job;
+import org.demo.jobmaster.entity.Runtime;
 
 /**
  * Mapper class to convert between {@link Job} and {@link JobDto}
@@ -56,7 +57,7 @@ public final class JobMapper {
                 .name(dto.getName())
                 .description(dto.getDescription())
                 .memorySize(dto.getMemorySize())
-                .runtime(dto.getRuntime() != null ? Job.Runtime.valueOf(dto.getRuntime()) : null)
+                .runtime(dto.getRuntime() != null ? Runtime.valueOf(dto.getRuntime()) : null)
                 .timeout(dto.getTimeout())
                 .active(dto.isActive())
                 .codeType(dto.getCodeType() != null ? Job.CodeType.valueOf(dto.getCodeType()) : null)
