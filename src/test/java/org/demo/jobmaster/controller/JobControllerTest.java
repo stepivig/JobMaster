@@ -19,7 +19,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import static org.hamcrest.Matchers.hasSize;
@@ -258,7 +257,7 @@ class JobControllerTest {
                 .status(Status.RUNNING)
                 .creationTime(tenMinutesAgo)
                 .startTime(now.minusMinutes(5))
-                .customInput(Map.of("key1", "value1"))
+                .customInput(List.of("value1"))
                 .output(null) // Still running, no output yet
                 .build();
 
@@ -268,7 +267,7 @@ class JobControllerTest {
                 .creationTime(tenMinutesAgo.minusMinutes(5))
                 .startTime(tenMinutesAgo)
                 .endTime(now)
-                .customInput(Map.of("key2", "value2"))
+                .customInput(List.of("value2"))
                 .output("Success result")
                 .build();
 
@@ -285,7 +284,7 @@ class JobControllerTest {
                 .andExpect(jsonPath("$[0].creationTime").exists())
                 .andExpect(jsonPath("$[0].startTime").exists())
                 .andExpect(jsonPath("$[0].endTime").doesNotExist()) // Should be null
-                .andExpect(jsonPath("$[0].customInput.key1").value("value1"))
+                .andExpect(jsonPath("$[0].customInput[0]").value("value1"))
                 .andExpect(jsonPath("$[0].output").doesNotExist()) // Should be null
 
                 // Second execution (COMPLETED)
@@ -294,7 +293,7 @@ class JobControllerTest {
                 .andExpect(jsonPath("$[1].creationTime").exists())
                 .andExpect(jsonPath("$[1].startTime").exists())
                 .andExpect(jsonPath("$[1].endTime").exists())
-                .andExpect(jsonPath("$[1].customInput.key2").value("value2"))
+                .andExpect(jsonPath("$[1].customInput[0]").value("value2"))
                 .andExpect(jsonPath("$[1].output").value("Success result"));
     }
 
@@ -309,7 +308,7 @@ class JobControllerTest {
                 .creationTime(now.minusMinutes(15))
                 .startTime(now.minusMinutes(10))
                 .endTime(now.minusMinutes(5))
-                .customInput(Map.of("key1", "value1", "key2", "value2"))
+                .customInput(List.of("value1", "value2"))
                 .output("Execution output with logs")
                 .build();
 
@@ -323,9 +322,8 @@ class JobControllerTest {
                 .andExpect(jsonPath("$.creationTime").exists())
                 .andExpect(jsonPath("$.startTime").exists())
                 .andExpect(jsonPath("$.endTime").exists())
-                .andExpect(jsonPath("$.customInput").isMap())
-                .andExpect(jsonPath("$.customInput.key1").value("value1"))
-                .andExpect(jsonPath("$.customInput.key2").value("value2"))
+                .andExpect(jsonPath("$.customInput[0]").value("value1"))
+                .andExpect(jsonPath("$.customInput[1]").value("value2"))
                 .andExpect(jsonPath("$.output").value("Execution output with logs"));
     }
 

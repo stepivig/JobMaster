@@ -3,6 +3,7 @@ package org.demo.jobmaster.executor;
 import lombok.extern.slf4j.Slf4j;
 import org.demo.jobmaster.entity.Job;
 import org.demo.jobmaster.entity.Runtime;
+import org.demo.jobmaster.util.FilesUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.kotlin.cli.common.ExitCode;
 import org.jetbrains.kotlin.cli.common.arguments.K2JVMCompilerArguments;
@@ -12,7 +13,6 @@ import org.jetbrains.kotlin.cli.common.messages.MessageCollector;
 import org.jetbrains.kotlin.cli.jvm.K2JVMCompiler;
 import org.jetbrains.kotlin.config.Services;
 import org.springframework.stereotype.Component;
-import util.FilesUtils;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -23,7 +23,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
@@ -176,11 +175,9 @@ public class JobExecutorKotlinImpl implements JobExecutor {
             command.add(directory.toString());
         }
         command.add(CLASS_NAME);
-        Map<String, String> inputs = job.getCodeInput();
+        List<String> inputs = job.getCodeInput();
         if (inputs != null && !inputs.isEmpty()) {
-            for (Map.Entry<String, String> entry : inputs.entrySet()) {
-                command.add(entry.getKey() + "=" + entry.getValue());
-            }
+            command.addAll(inputs);
         }
         return command;
     }

@@ -8,8 +8,7 @@ import org.junit.jupiter.api.io.TempDir;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
@@ -136,21 +135,16 @@ class JobExecutorKotlinImplTest {
     void shouldHandleInputParameters() {
         // Given
         jobExecutor = new JobExecutorKotlinImpl();
-        Map<String, String> inputs = new HashMap<>();
-        inputs.put("name", "John");
 
-        // Fixed: Using correct Kotlin split syntax with named parameters
-        String codeRaw = "class Main { companion object { \n" +
-                "   @JvmStatic fun main(args: Array<String>) { \n" +
-                "       for (arg in args) { \n" +
-                "           val parts = arg.split(\"=\", limit = 2) \n" + // Fixed: added 'limit =' parameter name
-                "           if (parts.size == 2 && parts[0] == \"name\") { \n" +
-                "               println(\"Hello, ${parts[1]}\") \n" +
-                "           } \n" +
-                "       } \n" +
-                "   } \n" +
-                "}}";
-        Job job = createJob(codeRaw, 1000L, 256, inputs);
+        String codeRaw = """
+                class Main { companion object {\s
+                   @JvmStatic fun main(args: Array<String>) {\s
+                       for (arg in args) {\s
+                           println("Hello, " + arg)\s
+                       }\s
+                   }\s
+                }}""";
+        Job job = createJob(codeRaw, 1000L, 256, List.of("John"));
 
         AtomicReference<String> successResult = new AtomicReference<>();
         AtomicReference<String> errorResult = new AtomicReference<>();
@@ -169,28 +163,25 @@ class JobExecutorKotlinImplTest {
     void shouldHandleMultipleInputParameters() {
         // Given
         jobExecutor = new JobExecutorKotlinImpl();
-        Map<String, String> inputs = new HashMap<>();
-        inputs.put("firstName", "John");
-        inputs.put("lastName", "Doe");
 
         String codeRaw = """
-                class Main { companion object {\s
-                   @JvmStatic fun main(args: Array<String>) {\s
+                class Main { companion object {
+                   @JvmStatic fun main(args: Array<String>) {
                        var firstName = ""
                        var lastName = ""
-                       for (arg in args) {\s
-                           val parts = arg.split("=", limit = 2)\s
-                           if (parts.size == 2) {\s
+                       for (arg in args) {
+                           val parts = arg.split("=", limit = 2)
+                           if (parts.size == 2) {
                                when (parts[0]) {
                                    "firstName" -> firstName = parts[1]
                                    "lastName" -> lastName = parts[1]
                                }
-                           }\s
-                       }\s
+                           }
+                       }
                        println("Hello, $firstName $lastName")
-                   }\s
+                   }
                 }}""";
-        Job job = createJob(codeRaw, 1000L, 256, inputs);
+        Job job = createJob(codeRaw, 1000L, 256, List.of("firstName=John", "lastName=Doe"));
 
         AtomicReference<String> successResult = new AtomicReference<>();
         AtomicReference<String> errorResult = new AtomicReference<>();
@@ -308,7 +299,7 @@ class JobExecutorKotlinImplTest {
         assertNull(errorResult.get());
     }
 
-    private Job createJob(String sourceCode, long timeout, int memorySize, Map<String, String> codeInput) {
+    private Job createJob(String sourceCode, long timeout, int memorySize, List<String> codeInput) {
         return Job.builder()
                 .id(1L)
                 .codeType(Job.CodeType.RAW)

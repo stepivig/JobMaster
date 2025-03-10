@@ -8,8 +8,7 @@ import org.junit.jupiter.api.io.TempDir;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
@@ -136,20 +135,15 @@ class JobExecutorJavaImplTest {
     void shouldHandleInputParameters() {
         // Given
         jobExecutor = new JobExecutorJavaImpl();
-        Map<String, String> inputs = new HashMap<>();
-        inputs.put("name", "John");
 
         String codeRaw = "public class Main { " +
                 "   public static void main(String[] args) { " +
                 "       for (String arg : args) {" +
-                "           String[] parts = arg.split(\"=\", 2);" +
-                "           if (parts.length == 2 && \"name\".equals(parts[0])) {" +
-                "               System.out.println(\"Hello, \" + parts[1]);" +
-                "           }" +
+                "           System.out.println(\"Hello, \" + arg);" +
                 "       }" +
                 "   } " +
                 "}";
-        Job job = createJob(codeRaw, 1000L, 256, inputs);
+        Job job = createJob(codeRaw, 1000L, 256, List.of("John"));
 
         AtomicReference<String> successResult = new AtomicReference<>();
         AtomicReference<String> errorResult = new AtomicReference<>();
@@ -218,7 +212,7 @@ class JobExecutorJavaImplTest {
         }
     }
 
-    private Job createJob(String sourceCode, long timeout, int memorySize, Map<String, String> codeInput) {
+    private Job createJob(String sourceCode, long timeout, int memorySize, List<String> codeInput) {
         return Job.builder()
                 .id(1L)
                 .codeType(Job.CodeType.RAW)

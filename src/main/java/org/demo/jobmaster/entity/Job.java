@@ -6,7 +6,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
-import java.util.Map;
+import java.util.List;
 
 /**
  * Represents a job entity that can be scheduled for execution.
@@ -29,7 +29,7 @@ public class Job {
     private final CodeType codeType;
     @ToString.Exclude
     private final String codeRaw;
-    private final Map<String, String> codeInput;
+    private final List<String> codeInput;
     // Schedule details
     private final ScheduleType scheduleType;
     private final String cronExpression;

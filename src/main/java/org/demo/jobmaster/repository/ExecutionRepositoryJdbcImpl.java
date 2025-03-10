@@ -1,8 +1,8 @@
 package org.demo.jobmaster.repository;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.demo.jobmaster.entity.Execution;
 import org.demo.jobmaster.entity.Status;
+import org.demo.jobmaster.util.DataBaseUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -21,13 +21,12 @@ import java.util.Optional;
  * JDBC implementation of the {@link ExecutionRepository}
  */
 @Repository
-public class ExecutionRepositoryJdbcImpl extends SerializableObjectAbstractRepository implements ExecutionRepository {
+public class ExecutionRepositoryJdbcImpl implements ExecutionRepository {
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
 
     @Autowired
-    protected ExecutionRepositoryJdbcImpl(NamedParameterJdbcTemplate jdbcTemplate, ObjectMapper objectMapper) {
-        super(objectMapper);
+    public ExecutionRepositoryJdbcImpl(NamedParameterJdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -70,7 +69,7 @@ public class ExecutionRepositoryJdbcImpl extends SerializableObjectAbstractRepos
                 .addValue("creationTime", creationTime != null ? Timestamp.valueOf(creationTime) : null)
                 .addValue("startTime", startTime != null ? Timestamp.valueOf(startTime) : null)
                 .addValue("endTime", endTime != null ? Timestamp.valueOf(endTime) : null)
-                .addValue("customInput", serialize(execution.getCustomInput()))
+                .addValue("customInput", DataBaseUtils.toString(execution.getCustomInput()))
                 .addValue("output", execution.getOutput());
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -134,7 +133,7 @@ public class ExecutionRepositoryJdbcImpl extends SerializableObjectAbstractRepos
                 .creationTime(creationTime != null ? creationTime.toLocalDateTime() : null)
                 .startTime(startTime != null ? startTime.toLocalDateTime() : null)
                 .endTime(endTime != null ? endTime.toLocalDateTime() : null)
-                .customInput(deserialize(rs, "custom_input"))
+                .customInput(DataBaseUtils.toList(rs, "custom_input"))
                 .output(rs.getString("output"))
                 .build();
     }
