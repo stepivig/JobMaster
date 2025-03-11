@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
-import java.util.Map;
+import java.util.List;
 
 @ToString
 @Getter
@@ -16,6 +16,6 @@ public class Execution {
     private final LocalDateTime creationTime;
     private final LocalDateTime startTime;
     private final LocalDateTime endTime;
-    private final Map<String, String> customInput;
+    private final List<String> customInput;
     private final String output;
 }

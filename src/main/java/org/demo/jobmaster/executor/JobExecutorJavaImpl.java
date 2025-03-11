@@ -3,8 +3,8 @@ package org.demo.jobmaster.executor;
 import lombok.extern.slf4j.Slf4j;
 import org.demo.jobmaster.entity.Job;
 import org.demo.jobmaster.entity.Runtime;
+import org.demo.jobmaster.util.FilesUtils;
 import org.springframework.stereotype.Component;
-import util.FilesUtils;
 
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
@@ -16,7 +16,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
@@ -100,7 +99,7 @@ public class JobExecutorJavaImpl implements JobExecutor {
     private ProcessResult execute(Path directory,
                                   int memoryMB,
                                   long timeoutMillis,
-                                  Map<String, String> inputs) throws IOException, InterruptedException {
+                                  List<String> inputs) throws IOException, InterruptedException {
         List<String> command = constructCommand(directory, memoryMB, inputs);
 
 
@@ -130,7 +129,7 @@ public class JobExecutorJavaImpl implements JobExecutor {
         }
     }
 
-    private List<String> constructCommand(Path directory, int memoryMB, Map<String, String> inputs) {
+    private List<String> constructCommand(Path directory, int memoryMB, List<String> inputs) {
         List<String> command = new ArrayList<>(6);
         command.add("java");
         command.add("-Xmx" + memoryMB + "M");
@@ -139,9 +138,7 @@ public class JobExecutorJavaImpl implements JobExecutor {
         command.add(directory.toString());
         command.add(CLASS_NAME);
         if (inputs != null && !inputs.isEmpty()) {
-            for (Map.Entry<String, String> entry : inputs.entrySet()) {
-                command.add(entry.getKey() + "=" + entry.getValue());
-            }
+            command.addAll(inputs);
         }
         return command;
     }

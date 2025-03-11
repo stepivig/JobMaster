@@ -1,9 +1,9 @@
 package org.demo.jobmaster.repository;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.demo.jobmaster.entity.Job;
 import org.demo.jobmaster.entity.Runtime;
+import org.demo.jobmaster.util.DataBaseUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -20,13 +20,12 @@ import java.util.Optional;
  * JDBC implementation of the {@link JobRepository}
  */
 @Repository
-public class JobRepositoryJdbcImpl extends SerializableObjectAbstractRepository implements JobRepository {
+public class JobRepositoryJdbcImpl implements JobRepository {
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
 
     @Autowired
-    public JobRepositoryJdbcImpl(NamedParameterJdbcTemplate jdbcTemplate, ObjectMapper objectMapper) {
-        super(objectMapper);
+    public JobRepositoryJdbcImpl(NamedParameterJdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -40,7 +39,7 @@ public class JobRepositoryJdbcImpl extends SerializableObjectAbstractRepository 
             .active(rs.getBoolean("active"))
             .codeType(Job.CodeType.valueOf(rs.getString("code_type")))
             .codeRaw(rs.getString("code_raw"))
-            .codeInput(deserialize(rs, "code_input"))
+            .codeInput(DataBaseUtils.toList(rs, "code_input"))
             .scheduleType(Job.ScheduleType.valueOf(rs.getString("schedule_type")))
             .cronExpression(rs.getString("schedule_cron_expression"))
             .createdAt(rs.getObject("created_at", LocalDateTime.class))
@@ -140,7 +139,7 @@ public class JobRepositoryJdbcImpl extends SerializableObjectAbstractRepository 
                 .addValue("active", job.isActive())
                 .addValue("codeType", job.getCodeType().getLiteral())
                 .addValue("codeRaw", job.getCodeRaw())
-                .addValue("codeInput", serialize(job.getCodeInput()))
+                .addValue("codeInput", DataBaseUtils.toString(job.getCodeInput()))
                 .addValue("scheduleType", job.getScheduleType().getLiteral())
                 .addValue("cronExpression", job.getCronExpression());
     }

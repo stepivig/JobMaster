@@ -3,16 +3,19 @@ package org.demo.jobmaster.dto;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import org.demo.jobmaster.entity.Job;
 import org.demo.jobmaster.entity.Runtime;
 import org.demo.jobmaster.validation.EnumValidator;
 import org.demo.jobmaster.validation.ValidCronExpression;
 
 import java.time.LocalDateTime;
-import java.util.Map;
+import java.util.List;
 
 /**
  * Data Transfer Object for {@link org.demo.jobmaster.entity.Job}
@@ -20,6 +23,9 @@ import java.util.Map;
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
 public class JobDto {
     private Long id;
     @NotBlank(message = "Job name cannot be empty")
@@ -38,7 +44,7 @@ public class JobDto {
     private String codeType;
     @NotBlank(message = "CodeRaw cannot be empty")
     private String codeRaw;
-    private Map<String, String> codeInput;
+    private List<String> codeInput;
     @NotNull(message = "ScheduleType cannot be null")
     @EnumValidator(enumClass = Job.ScheduleType.class, message = "Invalid ScheduleType")
     private String scheduleType;

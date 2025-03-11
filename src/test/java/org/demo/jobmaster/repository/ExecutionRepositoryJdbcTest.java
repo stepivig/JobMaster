@@ -1,6 +1,5 @@
 package org.demo.jobmaster.repository;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.demo.jobmaster.TestConfig;
 import org.demo.jobmaster.entity.Execution;
 import org.demo.jobmaster.entity.Runtime;
@@ -18,9 +17,7 @@ import org.springframework.test.context.ActiveProfiles;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -31,15 +28,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ExecutionRepositoryJdbcTest {
     @Autowired
     private NamedParameterJdbcTemplate jdbcTemplate;
-    @Autowired
-    private ObjectMapper objectMapper;
 
     private ExecutionRepositoryJdbcImpl executionRepository;
     private LocalDateTime baseTime;
 
     @BeforeEach
     void setUp() {
-        executionRepository = new ExecutionRepositoryJdbcImpl(jdbcTemplate, objectMapper);
+        executionRepository = new ExecutionRepositoryJdbcImpl(jdbcTemplate);
         baseTime = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
         saveTestJob();
     }
@@ -48,16 +43,13 @@ public class ExecutionRepositoryJdbcTest {
     @DisplayName("Should save execution with all fields populated")
     void shouldSaveExecutionWithAllFields() {
         // Given
-        Map<String, String> customInput = new HashMap<>();
-        customInput.put("param1", "value1");
-        customInput.put("param2", "value2");
-
+        List<String> input = List.of("value1", "value2");
         Execution execution = Execution.builder()
                 .status(Status.RUNNING)
                 .creationTime(baseTime)
                 .startTime(baseTime.plusMinutes(1))
                 .endTime(baseTime.plusMinutes(10))
-                .customInput(customInput)
+                .customInput(input)
                 .output("Test execution output")
                 .build();
 
@@ -72,8 +64,7 @@ public class ExecutionRepositoryJdbcTest {
         assertThat(savedExecution.get().getCreationTime()).isEqualTo(baseTime);
         assertThat(savedExecution.get().getStartTime()).isEqualTo(baseTime.plusMinutes(1));
         assertThat(savedExecution.get().getEndTime()).isEqualTo(baseTime.plusMinutes(10));
-        assertThat(savedExecution.get().getCustomInput()).containsEntry("param1", "value1");
-        assertThat(savedExecution.get().getCustomInput()).containsEntry("param2", "value2");
+        assertThat(savedExecution.get().getCustomInput()).containsExactlyInAnyOrder("value1", "value2");
         assertThat(savedExecution.get().getOutput()).isEqualTo("Test execution output");
     }
 

@@ -1,6 +1,5 @@
 package org.demo.jobmaster.repository;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.demo.jobmaster.TestConfig;
 import org.demo.jobmaster.entity.Job;
 import org.demo.jobmaster.entity.Job.CodeType;
@@ -19,7 +18,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -31,14 +29,12 @@ class JobRepositoryJdbcTest {
 
     @Autowired
     private NamedParameterJdbcTemplate jdbcTemplate;
-    @Autowired
-    private ObjectMapper objectMapper;
 
     private JobRepositoryJdbcImpl jobRepository;
 
     @BeforeEach
     void setUp() {
-        jobRepository = new JobRepositoryJdbcImpl(jdbcTemplate, objectMapper);
+        jobRepository = new JobRepositoryJdbcImpl(jdbcTemplate);
     }
 
     @AfterEach
@@ -159,9 +155,9 @@ class JobRepositoryJdbcTest {
     @DisplayName("Should correctly insert and fetch job with input data")
     void test06() {
         // Given
-        Map<String, String> inputData = Map.of("key1", "value1", "key2", "value2");
+        List<String> input = List.of("value1", "value2");
         Job job = getTestJobTemplate()
-                .codeInput(inputData)
+                .codeInput(input)
                 .build();
 
         // When
@@ -172,6 +168,6 @@ class JobRepositoryJdbcTest {
         assertThat(retrievedJobOpt).isPresent();
         Job retrievedJob = retrievedJobOpt.get();
         assertThat(retrievedJob.getCodeInput()).isNotNull();
-        assertThat(retrievedJob.getCodeInput()).containsExactlyInAnyOrderEntriesOf(inputData);
+        assertThat(retrievedJob.getCodeInput()).contains("value1", "value2");
     }
 }

@@ -1,4 +1,4 @@
-package util;
+package org.demo.jobmaster.util;
 
 import lombok.extern.slf4j.Slf4j;
 

@@ -307,7 +307,7 @@ class JobServiceImplTest {
                 .timeout(30000)
                 .codeType(Job.CodeType.RAW)
                 .codeRaw("console.log('test')")
-                .codeInput(Collections.emptyMap())
+                .codeInput(Collections.emptyList())
                 .scheduleType(scheduleType)
                 .cronExpression(cronExpression)
                 .createdAt(now)
