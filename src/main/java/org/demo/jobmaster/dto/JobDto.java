@@ -30,11 +30,12 @@ public class JobDto {
     private Long id;
     @NotBlank(message = "Job name cannot be empty")
     private String name;
+    @NotBlank(message = "Job description cannot be empty")
     private String description;
     @Min(value = 1, message = "Memory size must be at least 1 MB")
     private int memorySize;
     @NotBlank(message = "Runtime cannot be empty")
-    @EnumValidator(enumClass = Runtime.class, message = "Invalid ScheduleType")
+    @EnumValidator(enumClass = Runtime.class, message = "Invalid runtime")
     private String runtime;
     @Min(value = 1, message = "Timeout must be at least 1 second")
     private long timeout;

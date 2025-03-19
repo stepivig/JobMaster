@@ -53,13 +53,13 @@ public class JobExecutorJavaImpl implements JobExecutor {
         Path tempDir = null;
         try {
             tempDir = Files.createTempDirectory("job_" + job.getId() + "_" + "execution_" + executionId);
-            String compilationResult = compileCode(sourceCode, tempDir);
-            if (compilationResult != null) {
-                onError.accept("Compilation failed: " + compilationResult);
+            Result compilationResult = compileCode(sourceCode, tempDir);
+            if (!compilationResult.success()) {
+                onError.accept("Compilation failed: " + compilationResult.output());
                 return;
             }
 
-            ProcessResult result = execute(tempDir, job.getMemorySize(), job.getTimeout(), job.getCodeInput());
+            Result result = execute(tempDir, job.getMemorySize(), job.getTimeout(), job.getCodeInput());
             if (result.success()) {
                 onSuccess.accept(result.output());
             } else {
@@ -76,30 +76,35 @@ public class JobExecutorJavaImpl implements JobExecutor {
     /**
      * Compiles the Java source code and returns any compilation errors
      */
-    private String compileCode(String sourceCode, Path directory) throws IOException {
+    private Result compileCode(String sourceCode, Path directory) {
         Path sourceFilePath = directory.resolve(CLASS_NAME + ".java");
-        Files.writeString(sourceFilePath, sourceCode);
+        try {
+            Files.writeString(sourceFilePath, sourceCode);
 
-        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-        if (compiler == null) {
-            return "No Java compiler available";
-        }
-
-        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-             ByteArrayOutputStream errorStream = new ByteArrayOutputStream()) {
-            int result = compiler.run(null, outputStream, errorStream, sourceFilePath.toString());
-            if (result != 0) {
-                return errorStream.toString(StandardCharsets.UTF_8);
+            JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+            if (compiler == null) {
+                return new Result(false, "Java compiler not found");
             }
-        }
 
-        return null;
+            try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                 ByteArrayOutputStream errorStream = new ByteArrayOutputStream()) {
+                int result = compiler.run(null, outputStream, errorStream, sourceFilePath.toString());
+                if (result != 0) {
+                    String errorMessage = errorStream.toString(StandardCharsets.UTF_8);
+                    return new Result(false, "Compilation failed:\n" + errorMessage);
+                }
+            }
+            return new Result(true, null);
+        } catch (IOException e) {
+            log.error("Error writing source file", e);
+            return new Result(false, "Error writing source file: " + e.getMessage());
+        }
     }
 
-    private ProcessResult execute(Path directory,
-                                  int memoryMB,
-                                  long timeoutMillis,
-                                  List<String> inputs) throws IOException, InterruptedException {
+    private Result execute(Path directory,
+                           int memoryMB,
+                           long timeoutMillis,
+                           List<String> inputs) throws IOException, InterruptedException {
         List<String> command = constructCommand(directory, memoryMB, inputs);
 
 
@@ -112,7 +117,7 @@ public class JobExecutorJavaImpl implements JobExecutor {
 
         if (!completed) {
             process.destroyForcibly();
-            return new ProcessResult(false, "Execution timed out after " + timeoutMillis + " ms");
+            return new Result(false, "Execution timed out after " + timeoutMillis + " ms");
         }
 
         int exitCode = process.exitValue();
@@ -120,11 +125,11 @@ public class JobExecutorJavaImpl implements JobExecutor {
         if (exitCode != 0) {
             try (InputStream errorStream = process.getErrorStream()) {
                 String stderr = new String(errorStream.readAllBytes(), StandardCharsets.UTF_8);
-                return new ProcessResult(false, "Execution failed with exit code " + exitCode + ":\n" + stderr);
+                return new Result(false, "Execution failed with exit code " + exitCode + ":\n" + stderr);
             }
         } else {
             try (InputStream stream = process.getInputStream()) {
-                return new ProcessResult(true, new String(stream.readAllBytes(), StandardCharsets.UTF_8));
+                return new Result(true, new String(stream.readAllBytes(), StandardCharsets.UTF_8));
             }
         }
     }
@@ -143,6 +148,6 @@ public class JobExecutorJavaImpl implements JobExecutor {
         return command;
     }
 
-    private record ProcessResult(boolean success, String output) {
+    private record Result(boolean success, String output) {
     }
 }

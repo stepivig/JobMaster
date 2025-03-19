@@ -106,20 +106,16 @@ public class JobServiceImpl implements JobService, InitializingBean, DisposableB
      * Schedule a job based on its schedule type
      */
     private void scheduleJob(Job job) {
-        try {
-            Job.ScheduleType scheduleType = job.getScheduleType();
-            if (scheduleType == Job.ScheduleType.ONCE) {
-                taskScheduler.execute(() -> executeJob(job));
-                log.info("Scheduled one-time job: {}", job.getId());
-            } else if (scheduleType == Job.ScheduleType.CRON) {
-                var future = taskScheduler.schedule(() -> executeJob(job), new CronTrigger(job.getCronExpression()));
-                scheduledTasks.put(job.getId(), future);
-                log.info("Scheduled recurring job with cron expression '{}': {}", job.getCronExpression(), job.getId());
-            } else {
-                log.warn("Unsupported schedule type: {} for job: {}", scheduleType, job.getId());
-            }
-        } catch (Exception e) {
-            log.error("Failed to schedule job: {}", job.getId(), e);
+        Job.ScheduleType scheduleType = job.getScheduleType();
+        if (scheduleType == Job.ScheduleType.ONCE) {
+            taskScheduler.execute(() -> executeJob(job));
+            log.info("Scheduled one-time job: {}", job.getId());
+        } else if (scheduleType == Job.ScheduleType.CRON) {
+            var future = taskScheduler.schedule(() -> executeJob(job), new CronTrigger(job.getCronExpression()));
+            scheduledTasks.put(job.getId(), future);
+            log.info("Scheduled recurring job with cron expression '{}': {}", job.getCronExpression(), job.getId());
+        } else {
+            log.warn("Unsupported schedule type: {} for job: {}", scheduleType, job.getId());
         }
     }
 
@@ -132,11 +128,7 @@ public class JobServiceImpl implements JobService, InitializingBean, DisposableB
     }
 
     private void executeJob(Job job) {
-        try {
-            log.info("Executing job: {}", job.getId());
-            jobExecutionManager.submit(job);
-        } catch (Exception e) {
-            log.error("Error executing job: {}", job.getId(), e);
-        }
+        log.info("Executing job: {}", job.getId());
+        jobExecutionManager.submit(job);
     }
 }

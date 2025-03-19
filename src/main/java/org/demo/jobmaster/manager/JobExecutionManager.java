@@ -17,8 +17,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -34,7 +32,7 @@ public class JobExecutionManager implements DisposableBean {
     private final ExecutionService executionService;
     private final Map<Runtime, JobExecutor> jobExecutorMap;
     private final ExecutorService executorService;
-    private final Lock queueLock = new ReentrantLock();
+    private final Object queueLock = new Object();
 
     @Autowired
     public JobExecutionManager(ResourceManager resourceManager,
@@ -76,8 +74,7 @@ public class JobExecutionManager implements DisposableBean {
     }
 
     private void processQueue() {
-        queueLock.lock();
-        try {
+        synchronized (queueLock) {
             while (!jobQueue.isEmpty()) {
                 JobExecutionPair pair = jobQueue.peek();
                 Job job = pair.job();
@@ -94,8 +91,6 @@ public class JobExecutionManager implements DisposableBean {
 
                 executorService.submit(() -> executeJob(pair));
             }
-        } finally {
-            queueLock.unlock();
         }
     }
 

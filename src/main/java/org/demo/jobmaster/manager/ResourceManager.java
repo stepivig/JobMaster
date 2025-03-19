@@ -4,8 +4,6 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.management.MemoryMXBean;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Manages both memory and thread resources for job execution.
@@ -21,7 +19,7 @@ public class ResourceManager {
     @Getter
     private final int totalThreads;
 
-    private final Lock resourceLock = new ReentrantLock();
+    private final Object resourceLock = new Object();
 
     public ResourceManager(int memoryMaxByClientMB,
                            int memoryReservedPercents,
@@ -48,8 +46,7 @@ public class ResourceManager {
      * @return true if resources were successfully acquired, false otherwise
      */
     public boolean acquireResources(int memoryMB) {
-        resourceLock.lock();
-        try {
+        synchronized (resourceLock) {
             if (memoryMB > availableMemoryMB || availableThreads <= 0) {
                 return false;
             }
@@ -58,8 +55,6 @@ public class ResourceManager {
             availableThreads--;
 
             return true;
-        } finally {
-            resourceLock.unlock();
         }
     }
 
@@ -69,8 +64,7 @@ public class ResourceManager {
      * @param memoryMB Amount of memory to release in MB
      */
     public void releaseResources(int memoryMB) {
-        resourceLock.lock();
-        try {
+        synchronized (resourceLock) {
             int newMemory = availableMemoryMB + memoryMB;
             if (newMemory > totalMemoryMB) {
                 log.warn("Attempted to release more memory than total. Current: {}, Release: {}, Total: {}",
@@ -86,8 +80,6 @@ public class ResourceManager {
                 log.warn("Attempted to release more threads than total. Current: {}, Total: {}",
                         availableThreads, totalThreads);
             }
-        } finally {
-            resourceLock.unlock();
         }
     }
 

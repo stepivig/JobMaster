@@ -8,7 +8,6 @@ import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
-import org.demo.jobmaster.exception.InvalidEnumException;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -148,14 +147,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .stream()
                 .collect(Collectors.toMap(v -> v.getPropertyPath().toString(), ConstraintViolation::getMessage));
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
-    }
-
-    /**
-     * Handles invalid enum exceptions
-     */
-    @ExceptionHandler(InvalidEnumException.class)
-    public ResponseEntity<Map<String, String>> handleInvalidEnumException(InvalidEnumException e) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
     }
 
     /**
